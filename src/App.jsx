@@ -2,38 +2,23 @@ import react, { Fragment, useState, lazy, Suspense } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
-  BellIcon,
-  CalendarIcon,
-  ChartPieIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
-  HomeIcon,
-  UsersIcon,
   XMarkIcon,
+  HomeIcon
 } from '@heroicons/react/24/outline';
+
+import  useCounter from "remoteApp/Counter";
 
 import LocalPage from './components/LocalPage';
 // const Sample1Fallback = React.lazy(() => import('/pages/build/Sample1'));
 
-import remotePageRenderer from './Renderer';
+import { Outlet, Link } from 'react-router-dom';
+import { navigation } from './config/navigation';
 
-const navigation = [
-  {
-    idx: 0,
-    name: 'Sample1',
-    href: '?this=234#',
-    icon: HomeIcon,
-    current: true,
-  },
-  {
-    idx: 1,
-    name: 'Sample2',
-    href: '#',
-    icon: UsersIcon,
-    current: false,
-  },
-];
+const pages = [
+  { name: 'Page1', href: '#', current: false },
+  { name: 'Sub Page', href: '#', current: true },
+] 
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -58,9 +43,11 @@ function App() {
     setSettingsOpen(true);
   };
 
+  const [value] = useCounter();
+
   return (
     <>
-      <div>
+      <div className='h-screen w-screen bg-white text-gray-700'>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog
             as="div"
@@ -128,8 +115,8 @@ function App() {
                           <ul role="list" className="-mx-2 space-y-1">
                             {navigation.map((item) => (
                               <li key={item.name}>
-                                <a
-                                  href={item.href}
+                                <Link
+                                  to={item.href}
                                   onClick={() => setContent(item)}
                                   className={classNames(
                                     item.current
@@ -148,7 +135,7 @@ function App() {
                                     aria-hidden="true"
                                   />
                                   {item.name}
-                                </a>
+                                </Link>
                               </li>
                             ))}
                           </ul>
@@ -179,9 +166,9 @@ function App() {
                   <ul role="list" className="-mx-2 space-y-1">
                     {navigation.map((item) => (
                       <li key={item.name}>
-                        <a
+                        <Link
                           onClick={() => setContent(item)}
-                          href={item.href}
+                          to={item.href}
                           className={classNames(
                             item.current
                               ? 'bg-indigo-700 text-white'
@@ -199,16 +186,16 @@ function App() {
                             aria-hidden="true"
                           />
                           {item.name}
-                        </a>
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 </li>
 
                 <li className="mt-auto">
-                  <a
+                  <Link
                     onClick={() => openSettings()}
-                    href="#"
+                    to="/Settings"
                     className={classNames(
                       settingsOpen
                         ? 'bg-indigo-700 text-white'
@@ -221,7 +208,7 @@ function App() {
                       aria-hidden="true"
                     />
                     Settings
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </nav>
@@ -229,7 +216,7 @@ function App() {
         </div>
 
         <div className="lg:pl-72">
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4  bg-white px-4  sm:gap-x-6 sm:px-6 lg:px-8">
+          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center  bg-white ">
             <button
               type="button"
               className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
@@ -238,17 +225,58 @@ function App() {
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
+
+            <nav className="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
+     
+      <ol role="list" className="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">
+        <li className="flex">
+          <div className="flex items-center">
+            <a href="/" className="text-gray-400 hover:text-gray-500">
+              <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              <span className="sr-only">Home</span>
+            </a>
+          </div>
+        </li>
+        {pages.map((page) => (
+          <li key={page.name} className="flex">
+            <div className="flex items-center">
+              <svg
+                className="h-full w-6 flex-shrink-0 text-gray-200"
+                viewBox="0 0 24 44"
+                preserveAspectRatio="none"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+              </svg>
+              <a
+                href={page.href}
+                className="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
+                aria-current={page.current ? 'page' : undefined}
+              >
+                {page.name}
+              </a>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </nav>
           </div>
 
           <main className="py-10 ">
-            <div className="px-4 sm:px-6 lg:px-8">
-              {pageContent?.name
+            <div className="px-4 sm:px-6 lg:px-8 break-words">
+              This is a state from the Sample 2 REMOTE: {value}
+              <hr/>
+              <Outlet/>
+              {/* {pageContent?.name
                 ? remotePageRenderer(pageContent.name)
-                : pageContent}
+                : pageContent} */}
             </div>
           </main>
         </div>
       </div>
+      <button className="hidden bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => setValue(value + 1)}>Add</button>
+      
     </>
   );
 }

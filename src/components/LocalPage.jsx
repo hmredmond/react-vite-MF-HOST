@@ -1,6 +1,6 @@
 import react from 'react';
 
-function LocalPage() {
+export function LocalPage() {
   return <div>Local page in host project</div>;
 }
 
